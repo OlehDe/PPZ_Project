@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сайт Новин</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f9f9f9;
+    }
+    header {
+      background-color: #0077cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      background-color: #005fa3;
+      display: flex;
+      justify-content: center;
+    }
+    nav a {
+      color: white;
+      padding: 10px 20px;
+      display: block;
+      text-decoration: none;
+    }
+    nav a:hover {
+      background-color: #004885;
+    }
+    main {
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+    }
+    .news {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Сайт Новин</h1>
+</header>
+
+<nav>
+  <a href="#home">Головна</a>
+  <a href="#all-news">Усі новини</a>
+  <a href="#add-news">Додати новину</a>
+  <a href="#login">Увійти</a>
+  <a href="#register">Реєстрація</a>
+</nav>
+
+<main>
+  <section id="home">
+    <h2>Вітаємо на нашому сайті новин!</h2>
+    <p>Останні новини, оновлення та цікаві факти.</p>
+  </section>
+
+  <section id="all-news">
+    <h2>Усі новини</h2>
+    <div class="news">
+      <h3>Заголовок новини</h3>
+      <p>Текст новини...</p>
+    </div>
+    <div class="news">
+      <h3>Ще одна новина</h3>
+      <p>Короткий опис ще однієї новини...</p>
+    </div>
+  </section>
+
+  <section id="add-news">
+    <h2>Додати новину</h2>
+    <form>
+      <div class="form-group">
+        <label>Заголовок:</label>
+        <input type="text" name="title">
+      </div>
+      <div class="form-group">
+        <label>Текст новини:</label>
+        <textarea name="content" rows="5"></textarea>
+      </div>
+      <button type="submit">Додати</button>
+    </form>
+  </section>
+
+  <section id="login">
+    <h2>Вхід</h2>
+    <form>
+      <div class="form-group">
+        <label>Електронна пошта:</label>
+        <input type="email" name="email">
+      </div>
+      <div class="form-group">
+        <label>Пароль:</label>
+        <input type="password" name="password">
+      </div>
+      <button type="submit">Увійти</button>
+    </form>
+  </section>
+
+  <section id="register">
+    <h2>Реєстрація</h2>
+    <form>
+      <div class="form-group">
+        <label>Ім’я користувача:</label>
+        <input type="text" name="username">
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" name="email">
+      </div>
+      <div class="form-group">
+        <label>Пароль:</label>
+        <input type="password" name="password">
+      </div>
+      <button type="submit">Зареєструватись</button>
+    </form>
+  </section>
+</main>
+
+</body>
+</html>

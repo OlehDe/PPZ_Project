@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.shortcuts import render
+
 
 def index(request):
-    return HttpResponse("Привіт із додатку news! Це мій проект з ППЗ")
+    return render(request, "news/home.html")
