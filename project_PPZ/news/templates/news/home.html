@@ -15,6 +15,25 @@
       color: white;
       padding: 15px;
       text-align: center;
+      position: relative;
+    }
+    .auth-buttons {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+    }
+    .auth-buttons a {
+      background-color: white;
+      color: #0077cc;
+      border: none;
+      padding: 6px 12px;
+      margin-left: 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .auth-buttons a:hover {
+      background-color: #e0e0e0;
     }
     nav {
       background-color: #005fa3;
@@ -53,14 +72,16 @@
 
 <header>
   <h1>Сайт Новин</h1>
+  <div class="auth-buttons">
+    <a href="/login">Увійти</a>
+    <a href="/register">Реєстрація</a>
+  </div>
 </header>
 
 <nav>
   <a href="#home">Головна</a>
   <a href="#all-news">Усі новини</a>
   <a href="#add-news">Додати новину</a>
-  <a href="#login">Увійти</a>
-  <a href="#register">Реєстрація</a>
 </nav>
 
 <main>
@@ -93,40 +114,6 @@
         <textarea name="content" rows="5"></textarea>
       </div>
       <button type="submit">Додати</button>
-    </form>
-  </section>
-
-  <section id="login">
-    <h2>Вхід</h2>
-    <form>
-      <div class="form-group">
-        <label>Електронна пошта:</label>
-        <input type="email" name="email">
-      </div>
-      <div class="form-group">
-        <label>Пароль:</label>
-        <input type="password" name="password">
-      </div>
-      <button type="submit">Увійти</button>
-    </form>
-  </section>
-
-  <section id="register">
-    <h2>Реєстрація</h2>
-    <form>
-      <div class="form-group">
-        <label>Ім’я користувача:</label>
-        <input type="text" name="username">
-      </div>
-      <div class="form-group">
-        <label>Email:</label>
-        <input type="email" name="email">
-      </div>
-      <div class="form-group">
-        <label>Пароль:</label>
-        <input type="password" name="password">
-      </div>
-      <button type="submit">Зареєструватись</button>
     </form>
   </section>
 </main>
