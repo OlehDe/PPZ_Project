@@ -9,9 +9,19 @@ def index(request):
     return render(request, "news/home.html")
 
 def account_view(request):
-    return render(request, 'account.html', {
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()  # зберігаємо користувача
+            return redirect('http://127.0.0.1:8000/')  # або використай reverse('home')
+    else:
+        form = RegistrationForm()  # створення нової форми при GET-запиті
+
+    return render(request, 'news/account.html', {
+        'form': form,
         'user': request.user
     })
+
 
 def register_view(request):
     if request.method == "POST":
