@@ -32,3 +32,22 @@ class UserLoginForm(forms.Form):
                 raise forms.ValidationError("Цей обліковий запис неактивний")
 
         return cleaned_data
+
+class AccountEditForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError("Це ім'я користувача вже зайняте.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError("Ця електронна адреса вже використовується.")
+        return email
