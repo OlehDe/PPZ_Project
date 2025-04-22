@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Форма новини{% endblock %}
+{% block content %}
+<h2>{% if form.instance.pk %}Редагувати новину{% else %}Створити новину{% endif %}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Зберегти</button>
+</form>
+{% endblock %}

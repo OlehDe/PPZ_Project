@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ news.title }}{% endblock %}
+{% block content %}
+<h1>{{ news.title }}</h1>
+<p>{{ news.content }}</p>
+{% if news.image %}
+    <img src="{{ news.image.url }}" class="img-fluid my-3" alt="Зображення">
+{% endif %}
+<p><small>Автор: {{ news.author }} | {{ news.created_at|date:"d.m.Y H:i" }}</small></p>
+
+{% if user == news.author %}
+    <a href="{% url 'news:news_edit' news.pk %}" class="btn btn-warning">Редагувати</a>
+    <a href="{% url 'news:news_delete' news.pk %}" class="btn btn-danger">Видалити</a>
+{% endif %}
+
+<hr>
+<h4>Коментарі</h4>
+{% for comment in comments %}
+    <div class="border p-2 mb-2">
+        <p>{{ comment.text }}</p>
+        <small>— {{ comment.author }}, {{ comment.created_at|date:"d.m.Y H:i" }}</small>
+        {% if user == comment.author %}
+            <form method="post" action="{% url 'news:comment_delete' comment.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger mt-1">Видалити</button>
+            </form>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>Коментарів ще немає.</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <h5>Додати коментар</h5>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Надіслати</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Увійдіть</a>, щоб залишити коментар.</p>
+{% endif %}
+{% endblock %}
