@@ -71,7 +71,11 @@
     <p><strong>Ім’я користувача:</strong> {{ user.username }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <!-- Додаткову інформацію можна додати тут -->
-    <p><a href="/">Вийти з акаунту</a></p>
+    <form action="{% url 'news:logout' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Вийти з акаунту</button>
+</form>
+
   </div>
 </main>
 

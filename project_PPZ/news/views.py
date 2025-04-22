@@ -1,4 +1,4 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
@@ -48,3 +48,7 @@ def login_view(request):
     else:
         form = UserLoginForm()
     return render(request, 'news/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('http://127.0.0.1:8000/')
