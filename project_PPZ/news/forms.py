@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django import forms
+from .models import News
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -11,9 +13,14 @@ class RegistrationForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
+
+class NewsForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = ['title', 'content']
+
+
 # myapp/forms.py
-
-
 
 class UserLoginForm(forms.Form):
     username = forms.CharField(max_length=150)

@@ -49,6 +49,16 @@
     nav a:hover {
       background-color: #004885;
     }
+    .add-button {
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 4px;
+      margin: 5px 10px;
+      transition: background-color 0.3s;
+    }
+    .add-button:hover {
+      background-color: #45a049;
+    }
     main {
       padding: 20px;
     }
@@ -80,9 +90,11 @@
 </header>
 
 <nav>
-  <a href="#home">Головна</a>
-  <a href="#all-news">Усі новини</a>
-  <a href="#add-news">Додати новину</a>
+    <a href="#home">Головна</a>
+    <a href="#all-news">Усі новини</a>
+  <div class="add-button">
+    <a href="/add_news/"> Додати новину</a>
+  </div>
 </nav>
 
 <main>
@@ -92,31 +104,37 @@
   </section>
 
   <section id="all-news">
-    <h2>Усі новини</h2>
-    <div class="news">
-      <h3>Заголовок новини</h3>
-      <p>Текст новини...</p>
-    </div>
-    <div class="news">
-      <h3>Ще одна новина</h3>
-      <p>Короткий опис ще однієї новини...</p>
+  <h2>Усі новини</h2>
+    <div id="newsContainer">
+
+     <div class="news">
+        <h3>Заголовок новини</h3>
+        <p>Текст новини...</p>
+     </div>
+      <div class="news">
+        <h3>Ще одна новина</h3>
+        <p>Короткий опис ще однієї новини...</p>
+      </div>
     </div>
   </section>
 
-  <section id="add-news">
-    <h2>Додати новину</h2>
-    <form>
-      <div class="form-group">
-        <label>Заголовок:</label>
-        <input type="text" name="title">
-      </div>
-      <div class="form-group">
-        <label>Текст новини:</label>
-        <textarea name="content" rows="5"></textarea>
-      </div>
-      <button type="submit">Додати</button>
-    </form>
-  </section>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const newsContainer = document.getElementById('newsContainer');
+  const news = JSON.parse(localStorage.getItem('news') || '[]');
+
+  news.forEach(item => {
+    const newsDiv = document.createElement('div');
+    newsDiv.className = 'news';
+    newsDiv.innerHTML = `
+      <h3>${item.title}</h3>
+      <p>${item.content}</p>
+    `;
+    newsContainer.appendChild(newsDiv);
+  });
+});
+</script>
+
 </main>
 
 </body>
