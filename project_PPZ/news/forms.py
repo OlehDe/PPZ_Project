@@ -17,7 +17,7 @@ class RegistrationForm(UserCreationForm):
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'image']
 
 
 # myapp/forms.py

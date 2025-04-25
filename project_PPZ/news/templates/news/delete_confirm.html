@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Підтвердження видалення</title>
+</head>
+<body>
+
+  <h2>Ви впевнені, що хочете видалити новину?</h2>
+
+  <h3>{{ news.title }}</h3>
+  <p>{{ news.content|truncatechars:150 }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Так, видалити</button>
+    <a href='/'>Ні, повернутися</a>
+  </form>
+
+</body>
+</html>

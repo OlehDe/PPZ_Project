@@ -75,11 +75,12 @@
 </header>
 
 <nav>
-  <a href="http://127.0.0.1:8000/">Повернутися на головну</a>
+  <a href="/">Повернутися на головну</a>
 </nav>
 
 <main>
-  <form id="newsForm" onsubmit="handleSubmit(event)">
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     <div class="form-group">
       <label for="title">Заголовок новини:</label>
       <input type="text" id="title" name="title" required>
@@ -94,22 +95,6 @@
     </div>
     <button type="submit">Опублікувати новину</button>
   </form>
-
-  <script>
-  function handleSubmit(event) {
-  event.preventDefault();
-
-  const title = document.getElementById('title').value;
-  const content = document.getElementById('content').value;
-
-  const news = JSON.parse(localStorage.getItem('news') || '[]');
-  news.push({ title, content });
-  localStorage.setItem('news', JSON.stringify(news));
-
-  window.location.href = '/';
-}
-</script>
-
 </main>
 
 </body>

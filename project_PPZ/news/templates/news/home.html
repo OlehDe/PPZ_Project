@@ -7,7 +7,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       background-color: #f9f9f9;
     }
     header {
@@ -39,6 +40,9 @@
       background-color: #005fa3;
       display: flex;
       justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
     }
     nav a {
       color: white;
@@ -49,25 +53,22 @@
     nav a:hover {
       background-color: #004885;
     }
-    .add-button {
+    .add-button a {
       background-color: #4CAF50;
       color: white;
+      padding: 8px 15px;
       border-radius: 4px;
-      margin: 5px 10px;
-      transition: background-color 0.3s;
+      text-decoration: none;
     }
-    .add-button:hover {
+    .add-button a:hover {
       background-color: #45a049;
+    }
+    .disabled-button {
+      pointer-events: none;
+      opacity: 0.6;
     }
     main {
       padding: 20px;
-    }
-    .form-group {
-      margin-bottom: 10px;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
     }
     .news {
       background: white;
@@ -83,18 +84,29 @@
 <header>
   <h1>Сайт Новин</h1>
   <div class="auth-buttons">
-    <a href="/account">Акаунт</a>
-    <a href="/login">Увійти</a>
-    <a href="/register">Реєстрація</a>
+    {% if user.is_authenticated %}
+      <a href="/account">Акаунт</a>
+      <a href="/logout/">Вийти</a>
+    {% else %}
+      <a href="/login/">Увійти</a>
+      <a href="/register/">Реєстрація</a>
+    {% endif %}
   </div>
 </header>
 
 <nav>
-    <a href="#home">Головна</a>
-    <a href="#all-news">Усі новини</a>
-  <div class="add-button">
-    <a href="/add_news/"> Додати новину</a>
-  </div>
+  <a href="/">Головна</a>
+  <a href="/news/">Усі новини</a>
+
+  {% if user.is_authenticated %}
+    <div class="add-button">
+      <a href="/add_news/">Додати новину</a>
+    </div>
+  {% else %}
+    <div class="add-button disabled-button">
+      <a href="#">Додати новину (тільки для авторизованих)</a>
+    </div>
+  {% endif %}
 </nav>
 
 <main>
@@ -104,37 +116,25 @@
   </section>
 
   <section id="all-news">
-  <h2>Усі новини</h2>
+    <h2>Усі новини</h2>
     <div id="newsContainer">
+      {% for item in news_list %}
+        <div class="news">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.content }}</p>
 
-     <div class="news">
-        <h3>Заголовок новини</h3>
-        <p>Текст новини...</p>
-     </div>
-      <div class="news">
-        <h3>Ще одна новина</h3>
-        <p>Короткий опис ще однієї новини...</p>
-      </div>
+          {% if user == item.author or user.is_staff %}
+            <div style="margin-top: 10px;">
+              <a href='/edit_news' style="margin-right: 10px; color: #0077cc;">Редагувати</a>
+              <a href='/delete_news' style="color: red;">Видалити</a>
+            </div>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>Новин поки що немає.</p>
+      {% endfor %}
     </div>
   </section>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-  const newsContainer = document.getElementById('newsContainer');
-  const news = JSON.parse(localStorage.getItem('news') || '[]');
-
-  news.forEach(item => {
-    const newsDiv = document.createElement('div');
-    newsDiv.className = 'news';
-    newsDiv.innerHTML = `
-      <h3>${item.title}</h3>
-      <p>${item.content}</p>
-    `;
-    newsContainer.appendChild(newsDiv);
-  });
-});
-</script>
-
 </main>
 
 </body>

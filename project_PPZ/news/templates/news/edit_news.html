@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Редагувати новину</title>
+</head>
+<body>
+
+  <h1>Редагувати новину</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Заголовок:</label>
+    <input type="text" name="title" value="{{ news.title }}" required><br><br>
+
+    <label>Текст новини:</label><br>
+    <textarea name="content" rows="10" required>{{ news.content }}</textarea><br><br>
+
+    <label>Зображення:</label>
+    <input type="file" name="image"><br><br>
+
+    {% if news.image %}
+      <p>Поточне зображення:</p>
+      <img src="{{ news.image.url }}" width="200"><br><br>
+    {% endif %}
+
+    <button type="submit">Зберегти</button>
+    <a href='/'>Скасувати</a>
+  </form>
+
+</body>
+</html>

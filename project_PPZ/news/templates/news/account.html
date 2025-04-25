@@ -59,6 +59,7 @@
 <header>
   <h1>Сайт Новин</h1>
   <div class="auth-buttons">
+    <a href="/">Головна сторінка</a>
     <a href="/account">Акаунт</a>
     <a href="/login">Увійти</a>
     <a href="/register">Реєстрація</a>
@@ -71,7 +72,7 @@
     <p><strong>Ім’я користувача:</strong> {{ user.username }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <!-- Додаткову інформацію можна додати тут -->
-    <form action="{% url 'news:logout' %}" method="post">
+    <form action='/logout' method="post">
   {% csrf_token %}
   <button type="submit">Вийти з акаунту</button>
 </form>

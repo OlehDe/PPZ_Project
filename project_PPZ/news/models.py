@@ -8,6 +8,7 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
     class Meta:
         verbose_name = 'Новина'
         verbose_name_plural = 'Новини'
