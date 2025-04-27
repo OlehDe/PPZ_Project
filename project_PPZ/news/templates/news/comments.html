@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Коментарі до новини</title>
+</head>
+<body>
+  <h1>Коментарі до новини "{{ news.title }}"</h1>
+
+  <div>
+    {% for comment in comments %}
+      <p><strong>{{ comment.author.username }}:</strong> {{ comment.content }}</p>
+    {% empty %}
+      <p>Поки що немає коментарів.</p>
+    {% endfor %}
+  </div>
+
+  <a href="/">Повернутися на головну</a>
+</body>
+</html>

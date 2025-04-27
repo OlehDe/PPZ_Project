@@ -1,13 +1,10 @@
-from django.urls import path, include
-from django.contrib import admin
+from django.conf.urls.static import static
+from django.urls import path
+
 from . import views
-from .views import register_view, login_view, account_view, logout_view, home, edit_news, delete_news
 
-from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from .views import register_view, login_view, comment_delete, news_comments, user_comments
 
-from .forms import RegistrationForm, UserLoginForm, AccountEditForm
 
 app_name = "news"
 
@@ -21,6 +18,9 @@ urlpatterns = [
     path('account', views.account_view, name='account'),
     path('login/', login_view, name='login'),
     path('register/', register_view, name='register'),
-    path('logout', views.logout_view, name='logout')
+    path('logout', views.logout_view, name='logout'),
+    path('comment/<int:pk>/delete/', views.comment_delete, name='comment_delete'),
+    path('comments/<int:news_id>/', views.news_comments, name='news_comments'),
+    path('user_comments/', views.user_comments, name='user_comments'),
 ]
 

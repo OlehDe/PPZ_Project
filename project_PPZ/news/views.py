@@ -1,20 +1,38 @@
 from django.contrib.auth import login, authenticate, logout
+from django.core.checks import messages
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import RegistrationForm, UserLoginForm, AccountEditForm, NewsForm
+from .forms import RegistrationForm, UserLoginForm, AccountEditForm, NewsForm, CommentForm
 
 from django.contrib.auth.decorators import login_required
-from .models import News
+from .models import News, Comment
+
 
 def home(request):
-    news_list = News.objects.all().order_by('-created_at')
-    return render(request, 'news/home.html', {'news_list': news_list})
+    news_list = News.objects.all()
+
+    if request.method == 'POST':
+        news_id = request.POST.get('news_id')
+        news = get_object_or_404(News, id=news_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.news = news
+            comment.author = request.user
+            comment.save()
+            return redirect('http://127.0.0.1:8000/')  # Після додавання коментаря перезавантажуємо сторінку
+    else:
+        form = CommentForm()
+
+    return render(request, 'news/home.html', {
+        'news_list': news_list,
+        'form': form,  # Передаємо форму якщо потрібно
+    })
 
 def news_list(request):
     news = News.objects.all().order_by('-created_date')
     return render(request, 'news/news_list.html', {'news': news})
-
 
 @login_required
 def add_news(request):
@@ -31,7 +49,6 @@ def add_news(request):
         )
         return redirect('http://127.0.0.1:8000/')
     return render(request, 'news/add_news.html')
-
 
 def index(request):
     return render(request, "news/home.html")
@@ -52,7 +69,6 @@ def account_view(request):
 
 def account(request):
     return render(request, 'account.html')
-
 
 def register_view(request):
     if request.method == "POST":
@@ -113,3 +129,19 @@ def delete_news(request):
         return redirect('http://127.0.0.1:8000/')
 
     return render(request, 'news/delete_confirm.html', {'news': news})
+
+@login_required
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    comment.delete()
+    return redirect('http://127.0.0.1:8000/')  # або куди ти хочеш після видалення
+
+@login_required
+def user_comments(request):
+    comments = Comment.objects.filter(author=request.user)
+    return render(request, 'news/user_comments.html', {'comments': comments})
+
+def news_comments(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    comments = news.comments.all()
+    return render(request, 'news/comments.html', {'news': news, 'comments': comments})

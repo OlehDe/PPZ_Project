@@ -126,7 +126,36 @@
             <div style="margin-top: 10px;">
               <a href='/edit_news' style="margin-right: 10px; color: #0077cc;">Редагувати</a>
               <a href='/delete_news' style="color: red;">Видалити</a>
+              <a href='/comments/{{ item.id }}' style="margin-left: 10px; color: #0077cc;">Коментарі</a>
             </div>
+          {% endif %}
+
+          <!-- Коментарі -->
+          <div class="comments-section">
+            <h4>Коментарі:</h4>
+            {% for comment in item.comments.all %}
+              <div class="comment">
+                <p><strong>{{ comment.author.username }}:</strong> {{ comment.content }}</p>
+                {% if user == comment.author %}
+                  <a href="{% url 'news:comment_delete' comment.id %}" style="color: red;">Видалити коментар</a>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p>Немає коментарів для цієї новини.</p>
+            {% endfor %}
+          </div>
+
+          <!-- Форма для додавання коментаря -->
+          {% if user.is_authenticated %}
+            <h5>Додати коментар:</h5>
+            <form method="post" action="">
+              {% csrf_token %}
+              <textarea name="content" rows="4" cols="50" required></textarea><br>
+              <input type="hidden" name="news_id" value="{{ item.id }}">
+              <button type="submit">Додати коментар</button>
+            </form>
+          {% else %}
+            <p><a href="/login/">Увійдіть</a>, щоб додати коментар.</p>
           {% endif %}
         </div>
       {% empty %}
