@@ -83,6 +83,14 @@
       background-color: #f0f0f0;
       border-radius: 4px;
     }
+    .read-more {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .read-more:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -126,7 +134,16 @@
       {% for item in news_list %}
         <div class="news">
           <h3>{{ item.title }}</h3>
-          <p>{{ item.content }}</p>
+          <p>
+            {% with words=item.content.split %}
+              {% if words|length > 50 %}
+                {{ words|slice:":50"|join:" " }}...
+                <a href="/news/{{ item.id }}" class="read-more">переглянути детальніше...</a>
+              {% else %}
+                {{ item.content }}
+              {% endif %}
+            {% endwith %}
+          </p>
 
           {% if user == item.author or user.is_staff %}
             <div style="margin-top: 10px;">
