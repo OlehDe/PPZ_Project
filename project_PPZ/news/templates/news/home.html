@@ -77,6 +77,12 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    .comment {
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -126,37 +132,21 @@
             <div style="margin-top: 10px;">
               <a href='/edit_news' style="margin-right: 10px; color: #0077cc;">Редагувати</a>
               <a href='/delete_news' style="color: red;">Видалити</a>
-              <a href='/comments/{{ item.id }}' style="margin-left: 10px; color: #0077cc;">Коментарі</a>
             </div>
           {% endif %}
 
-          <!-- Коментарі -->
+          <!-- Показуємо лише останній коментар -->
           <div class="comments-section">
-            <h4>Коментарі:</h4>
-            {% for comment in item.comments.all %}
+            <h4>Останній коментар:</h4>
+            {% if item.comments.last %}
               <div class="comment">
-                <p><strong>{{ comment.author.username }}:</strong> {{ comment.content }}</p>
-                {% if user == comment.author %}
-                  <a href="{% url 'news:comment_delete' comment.id %}" style="color: red;">Видалити коментар</a>
-                {% endif %}
+                <p><strong>{{ item.comments.last.author.username }}:</strong> {{ item.comments.last.content }}</p>
               </div>
-            {% empty %}
-              <p>Немає коментарів для цієї новини.</p>
-            {% endfor %}
+              <p><a href='/comments/{{ item.id }}'>Дивитися всі коментарі ({{ item.comments.count }})</a></p>
+            {% else %}
+              <p>Немає коментарів. <a href='/comments/{{ item.id }}'>Додати коментар</a></p>
+            {% endif %}
           </div>
-
-          <!-- Форма для додавання коментаря -->
-          {% if user.is_authenticated %}
-            <h5>Додати коментар:</h5>
-            <form method="post" action="">
-              {% csrf_token %}
-              <textarea name="content" rows="4" cols="50" required></textarea><br>
-              <input type="hidden" name="news_id" value="{{ item.id }}">
-              <button type="submit">Додати коментар</button>
-            </form>
-          {% else %}
-            <p><a href="/login/">Увійдіть</a>, щоб додати коментар.</p>
-          {% endif %}
         </div>
       {% empty %}
         <p>Новин поки що немає.</p>

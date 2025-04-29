@@ -134,7 +134,7 @@ def delete_news(request):
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk, author=request.user)
     comment.delete()
-    return redirect('http://127.0.0.1:8000/')  # або куди ти хочеш після видалення
+    return redirect('http://127.0.0.1:8000/comments/10/')
 
 @login_required
 def user_comments(request):
@@ -145,3 +145,16 @@ def news_comments(request, news_id):
     news = get_object_or_404(News, id=news_id)
     comments = news.comments.all()
     return render(request, 'news/comments.html', {'news': news, 'comments': comments})
+
+@login_required
+def add_comment(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.news = news
+            comment.author = request.user
+            comment.save()
+            return redirect('news:news_comments', news_id=news.id)
+    return redirect('news:news_comments', news_id=news.id)
