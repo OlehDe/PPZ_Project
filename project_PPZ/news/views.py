@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
 from django.core.checks import messages
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -27,28 +28,26 @@ def home(request):
 
     return render(request, 'news/home.html', {
         'news_list': news_list,
-        'form': form,  # Передаємо форму якщо потрібно
+        'form': form,
     })
 
-def news_list(request):
+def news_list(request, pk):
     news = News.objects.all().order_by('-created_date')
     return render(request, 'news/news_list.html', {'news': news})
 
 @login_required
 def add_news(request):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        content = request.POST.get('content')
-        image = request.FILES.get('image')
+        form = NewsForm(request.POST, request.FILES)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
+            return redirect('http://127.0.0.1:8000/')
+    else:
+        form = NewsForm()
 
-        News.objects.create(
-            title=title,
-            content=content,
-            image=image,
-            author=request.user
-        )
-        return redirect('http://127.0.0.1:8000/')
-    return render(request, 'news/add_news.html')
+    return render(request, 'news/add_news.html', {'form': form})
 
 def index(request):
     return render(request, "news/home.html")
@@ -57,7 +56,7 @@ def account_view(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()  # зберігаємо користувача
+            form.save()
             return redirect('http://127.0.0.1:8000/')
     else:
         form = RegistrationForm()
@@ -102,32 +101,23 @@ def logout_view(request):
 
 
 @login_required
-def edit_news(request):
-    news = News.objects.filter(author=request.user).first()  # Отримуємо першу новину, що належить користувачеві
-    if not news:
-        return HttpResponseForbidden("У вас немає новин для редагування.")
-
+def edit_news(request, news_id):
+    news = get_object_or_404(News, id=news_id, author=request.user)
     if request.method == 'POST':
-        news.title = request.POST.get('title')
-        news.content = request.POST.get('content')
-        image = request.FILES.get('image')
-        if image:
-            news.image = image
-        news.save()
-        return redirect('http://127.0.0.1:8000/')
-
-    return render(request, 'news/edit_news.html', {'news': news})
+        form = NewsForm(request.POST, request.FILES, instance=news)
+        if form.is_valid():
+            form.save()
+            return redirect('http://127.0.0.1:8000/')
+    else:
+        form = NewsForm(instance=news)
+    return render(request, 'news/edit_news.html', {'form': form, 'news': news})
 
 @login_required
-def delete_news(request):
-    news = News.objects.filter(author=request.user).first()
-    if request.user != news.author:
-        return HttpResponseForbidden("Ви не можете видалити цю новину.")
-
+def delete_news(request, news_id):
+    news = get_object_or_404(News, id=news_id, author=request.user)
     if request.method == 'POST':
         news.delete()
-        return redirect('http://127.0.0.1:8000/')
-
+        return redirect('home')
     return render(request, 'news/delete_confirm.html', {'news': news})
 
 @login_required
@@ -158,3 +148,12 @@ def add_comment(request, news_id):
             comment.save()
             return redirect('news:news_comments', news_id=news.id)
     return redirect('news:news_comments', news_id=news.id)
+
+def news_detail(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    return render(request, 'news/news_detail.html', {'news': news})
+
+def user_news(request, username):
+    user = get_object_or_404(User, username=username)
+    news_list = News.objects.filter(author=user)
+    return render(request, 'news/user_news.html', {'news_list': news_list, 'viewed_user': user})

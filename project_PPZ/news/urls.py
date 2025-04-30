@@ -12,8 +12,8 @@ urlpatterns = [
     path('news/', views.news_list, name='news_list'),
 
     path('', views.home, name='home'),
-    path('edit_news', views.edit_news, name='edit_news'),
-    path('delete_news', views.delete_news, name='delete_news'),
+    path('edit_news/<int:news_id>', views.edit_news, name='edit_news'),
+    path('delete_news/<int:news_id>', views.delete_news, name='delete_news'),
     path('add_news/', views.add_news, name='add_news'),
     path('account', views.account_view, name='account'),
     path('login/', login_view, name='login'),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('comments/<int:news_id>/', views.news_comments, name='news_comments'),
     path('user_comments/', views.user_comments, name='user_comments'),
 
+    path('user_news/<str:username>/', views.user_news, name='user_news'),
+    path('news_detail/<int:news_id>/', views.news_detail, name='news_detail'),
     path('comments/<int:news_id>/add/', views.add_comment, name='add_comment'),
 ]
 

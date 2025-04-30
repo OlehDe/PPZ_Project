@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Новини користувача: {{ viewed_user.username }}</h2>
+
+  {% if news_list %}
+    <ul>
+      {% for news in news_list %}
+        <li>
+          <a href="/news_detail/{{ item.id }}">{{ news.title }}</a>
+          <p>{{ news.created_at|date:"d.m.Y H:i" }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Цей користувач ще не опублікував жодної новини.</p>
+  {% endif %}
+{% endblock %}

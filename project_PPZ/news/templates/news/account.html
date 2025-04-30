@@ -1,84 +1,73 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Акаунт</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f9f9f9;
-    }
-    header {
-      background-color: #0077cc;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      position: relative;
-    }
-    .auth-buttons {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-    }
-    .auth-buttons a {
-      background-color: white;
-      color: #0077cc;
-      border: none;
-      padding: 6px 12px;
-      margin-left: 10px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .auth-buttons a:hover {
-      background-color: #e0e0e0;
-    }
-    main {
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-    }
-    .account-info {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .account-info h2 {
-      margin-top: 0;
-    }
-    .account-info p {
-      margin: 8px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Акаунт - {{ user.username }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .account-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .news-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .news-item h3 {
+            margin-top: 0;
+            color: #0077cc;
+        }
+        .news-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
+    <div class="account-container">
+        <div class="user-info">
+            <h1>Акаунт користувача: {{ user.username }}</h1>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <form action='/logout' method="post">
+                {% csrf_token %}
+                <button type="submit">Вийти з акаунту</button>
+            </form>
+        </div>
 
-<header>
-  <h1>Сайт Новин</h1>
-  <div class="auth-buttons">
-    <a href="/">Головна сторінка</a>
-    <a href="/account">Акаунт</a>
-    <a href="/login">Увійти</a>
-    <a href="/register">Реєстрація</a>
-  </div>
-</header>
-
-<main>
-  <div class="account-info">
-    <h2>Ваш акаунт</h2>
-    <p><strong>Ім’я користувача:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <!-- Додаткову інформацію можна додати тут -->
-    <form action='/logout' method="post">
-  {% csrf_token %}
-  <button type="submit">Вийти з акаунту</button>
-</form>
-
-  </div>
-</main>
-
+        <h2>Мої новини ({{ user_news.count }})</h2>
+        {% if user_news %}
+            {% for news in user_news %}
+                <div class="news-item">
+                    <h3><a href="/news_detail/{{ item.id }}">{{ news.title }}</a></h3>
+                    <p class="news-meta">
+                        Опубліковано: {{ news.created_at|date:"d.m.Y H:i" }} |
+                        <a href='/edit_news/{{ item.id }}'>Редагувати</a> |
+                        <a href="/delete_news/{{ news.id }}" style="color: red;">Видалити</a>
+                    </p>
+                    <p>{{ news.content|truncatechars:150 }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Ви ще не створили жодної новини.</p>
+            <a href='/add_news' class="button">Створити першу новину</a>
+        {% endif %}
+    </div>
 </body>
 </html>
