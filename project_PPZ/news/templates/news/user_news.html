@@ -1,18 +1,65 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Новини автора {{ author.username }}</title>
+    <style>
+        /* Використовуйте ті ж стилі, що й у home.html */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .news {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .author-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
 
-{% block content %}
-  <h2>Новини користувача: {{ viewed_user.username }}</h2>
+    <div class="container">
+        <div class="author-header">
+            <h1>Новини автора: {{ author.username }}</h1>
+            <p>Всього новин: {{ news_list.count }}</p>
+        </div>
 
-  {% if news_list %}
-    <ul>
-      {% for news in news_list %}
-        <li>
-          <a href="/news_detail/{{ item.id }}">{{ news.title }}</a>
-          <p>{{ news.created_at|date:"d.m.Y H:i" }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Цей користувач ще не опублікував жодної новини.</p>
-  {% endif %}
-{% endblock %}
+        {% if news_list %}
+            {% for news in news_list %}
+                <div class="news">
+                    <h3>{{ news.title }}</h3>
+                    <p>{{ news.content|truncatechars:150 }}</p>
+                    <a href="/news_detail/{{ news.id }}">Детальніше</a>
+                    {% if current_user == news.author or current_user.is_staff %}
+                        <div style="margin-top: 10px;">
+                            <a href="/edit_news/{{ news.id }}" style="margin-right: 10px; color: #0077cc;">Редагувати</a>
+                            <a href="/delete_news/{{ news.id }}" style="color: red;">Видалити</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Цей автор ще не опублікував жодної новини.</p>
+        {% endif %}
+
+        <a href="/" style="display: inline-block; margin-top: 20px;">← Повернутися на головну</a>
+    </div>
+</body>
+</html>

@@ -153,7 +153,13 @@ def news_detail(request, news_id):
     news = get_object_or_404(News, id=news_id)
     return render(request, 'news/news_detail.html', {'news': news})
 
+from django.contrib.auth.models import User
+
 def user_news(request, username):
-    user = get_object_or_404(User, username=username)
-    news_list = News.objects.filter(author=user)
-    return render(request, 'news/user_news.html', {'news_list': news_list, 'viewed_user': user})
+    author = get_object_or_404(User, username=username)
+    news_list = News.objects.filter(author=author).order_by('-created_at')
+    return render(request, 'news/user_news.html', {
+        'author': author,
+        'news_list': news_list,
+        'current_user': request.user
+    })
