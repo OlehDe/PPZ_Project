@@ -11,7 +11,7 @@ from .models import News, Comment
 
 
 def home(request):
-    news_list = News.objects.all()
+    news_list = News.objects.all().order_by('-created_at')[:2]
 
     if request.method == 'POST':
         news_id = request.POST.get('news_id')
@@ -22,7 +22,7 @@ def home(request):
             comment.news = news
             comment.author = request.user
             comment.save()
-            return redirect('http://127.0.0.1:8000/')  # Після додавання коментаря перезавантажуємо сторінку
+            return redirect('http://127.0.0.1:8000/')
     else:
         form = CommentForm()
 
@@ -31,7 +31,7 @@ def home(request):
         'form': form,
     })
 
-def news_list(request, pk):
+def news_list(request):
     news = News.objects.all().order_by('-created_date')
     return render(request, 'news/news_list.html', {'news': news})
 
@@ -52,7 +52,10 @@ def add_news(request):
 def index(request):
     return render(request, "news/home.html")
 
+
 def account_view(request):
+    user_news = News.objects.filter(author=request.user).order_by('-created_at')
+
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -63,7 +66,9 @@ def account_view(request):
 
     return render(request, 'news/account.html', {
         'form': form,
-        'user': request.user
+        'user': request.user,
+        'news_list': user_news,
+        'user_news': user_news,
     })
 
 def account(request):
@@ -117,7 +122,7 @@ def delete_news(request, news_id):
     news = get_object_or_404(News, id=news_id, author=request.user)
     if request.method == 'POST':
         news.delete()
-        return redirect('home')
+        return redirect('/')
     return render(request, 'news/delete_confirm.html', {'news': news})
 
 @login_required
@@ -163,3 +168,8 @@ def user_news(request, username):
         'news_list': news_list,
         'current_user': request.user
     })
+
+def all_news(request):
+    news_list = News.objects.all().order_by('-created_at')
+    context = {'news_list': news_list}
+    return render(request, 'news/all_news.html', context)
