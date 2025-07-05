@@ -226,12 +226,18 @@
                 return response.json();
             })
             .then(data => {
-                // ✅ Тільки якщо немає помилок, оновлюємо гру
+                if (data.error) {
+                    alert(data.error);
+                    return; // ❌ Хід не переходить
+                }
+
                 if (data.status === "hit") {
                     cellElement.classList.add('hit');
                 } else {
                     cellElement.classList.add('miss');
                 }
+
+                // ✅ Змінюємо хід лише якщо клітинка була нова
                 currentAttacker = data.next_attacker;
                 currentTarget = data.next_target;
                 updateHighlights();

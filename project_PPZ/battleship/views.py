@@ -13,23 +13,53 @@ players = {
 player_order = ["A", "B", "C", "D"]
 current_attacker_index = 0
 
+import random
+
+# Функція для перевірки чи можна поставити корабель
+def can_place_ship(board, x, y, size, horizontal):
+    for i in range(-1, size + 1):
+        for j in [-1, 0, 1]:
+            xi = x + (i if horizontal else 0)
+            yi = y + (0 if horizontal else i)
+            xi += j if not horizontal else 0
+            yi += j if horizontal else 0
+            if 0 <= xi < 10 and 0 <= yi < 10:
+                if board[yi][xi] != 0:
+                    return False
+    return True
+
+# Функція для розміщення корабля
+def place_ship(board, x, y, size, horizontal):
+    for i in range(size):
+        xi = x + i if horizontal else x
+        yi = y if horizontal else y + i
+        board[yi][xi] = 1
+
+# Генерація флоту
+def generate_fleet():
+    board = [[0 for _ in range(10)] for _ in range(10)]
+    ships = [(4, 1), (3, 2), (2, 3), (1, 4)]  # (size, count)
+
+    for size, count in ships:
+        for _ in range(count):
+            placed = False
+            while not placed:
+                horizontal = random.choice([True, False])
+                x = random.randint(0, 10 - (size if horizontal else 1))
+                y = random.randint(0, 10 - (1 if horizontal else size))
+                if can_place_ship(board, x, y, size, horizontal):
+                    place_ship(board, x, y, size, horizontal)
+                    placed = True
+    return board
+
 # Ініціалізація гри
 def init_game():
     global players, current_attacker_index
-    from random import randint
-
     for player in players:
-        board = [[0 for _ in range(10)] for _ in range(10)]  # 10x10 поле
-        # Розставляємо 3 випадкові кораблі
-        placed = 0
-        while placed < 3:
-            x, y = randint(0, 9), randint(0, 9)
-            if board[y][x] == 0:
-                board[y][x] = 1  # 1 = корабель
-                placed += 1
-        players[player]["board"] = board
+        players[player]["board"] = generate_fleet()
         players[player]["alive"] = True
     current_attacker_index = 0
+
 
 # Пошук наступного гравця
 def next_target_index(start_index):
@@ -60,6 +90,10 @@ def attack(request):
         target = players.get(target_name)
         if not target or not target["alive"]:
             return JsonResponse({"error": "Invalid target"}, status=400)
+
+        # Якщо клітинка вже атакована
+        if target["board"][y][x] in [2, 3]:
+            return JsonResponse({"error": "Ця клітинка вже була атакована!"}, status=400)
 
         # 🟢 Перевірка діапазону
         if not (0 <= x < len(target["board"][0]) and 0 <= y < len(target["board"])):
