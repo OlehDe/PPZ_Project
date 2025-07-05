@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Морський бій для 4 гравців</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .player-board {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 280px;
+            transition: 0.3s;
+        }
+        .player-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(11, 24px);
+            grid-template-rows: repeat(11, 24px);
+            gap: 1px;
+            margin: 0 auto;
+        }
+        .cell {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: #e6f7ff;
+        }
+        .cell.hit {
+            background-color: #ff6b6b;
+        }
+        .cell.miss {
+            background-color: #d1d1d1;
+        }
+        .attacker {
+            box-shadow: 0 0 15px 3px #4CAF50 !important;
+        }
+        .target {
+            box-shadow: 0 0 15px 3px #f44336 !important;
+        }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color: #2c3e50;">Морський бій для 4 гравців</h1>
+
+    <div class="game-container">
+        <!-- Гравець A -->
+        <div class="player-board" id="playerA">
+            <div class="player-title">A</div>
+            <div class="grid" id="gridA"></div>
+        </div>
+
+        <!-- Гравець B -->
+        <div class="player-board" id="playerB">
+            <div class="player-title">B</div>
+            <div class="grid" id="gridB"></div>
+        </div>
+
+        <!-- Гравець C -->
+        <div class="player-board" id="playerC">
+            <div class="player-title">C</div>
+            <div class="grid" id="gridC"></div>
+        </div>
+
+        <!-- Гравець D -->
+        <div class="player-board" id="playerD">
+            <div class="player-title">D</div>
+            <div class="grid" id="gridD"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="start-game">Почати гру</button>
+        <button id="reset-game">Скинути</button>
+    </div>
+
+    <script>
+        const players = ['A', 'B', 'C', 'D'];
+        let currentAttacker = 'A';
+        let currentTarget = 'B';
+
+        // Створюємо сітки для кожного гравця
+        players.forEach(player => {
+            const grid = document.getElementById('grid' + player);
+            for (let row = 0; row <= 10; row++) {
+                for (let col = 0; col <= 10; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+
+                    // Заголовки
+                    if (row === 0 && col === 0) {
+                        cell.textContent = '';
+                    } else if (row === 0) {
+                        cell.textContent = col;
+                    } else if (col === 0) {
+                        cell.textContent = String.fromCharCode(64 + row);
+                    } else {
+                        cell.dataset.x = col - 1;
+                        cell.dataset.y = row - 1;
+                        cell.addEventListener('click', function() {
+                            attackCell(player, cell.dataset.x, cell.dataset.y);
+                        });
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        });
+
+        function updateHighlights() {
+            players.forEach(p => {
+                document.getElementById('player' + p).classList.remove('attacker', 'target');
+            });
+            document.getElementById('player' + currentAttacker).classList.add('attacker');
+            document.getElementById('player' + currentTarget).classList.add('target');
+        }
+
+        function attackCell(targetPlayer, x, y) {
+            fetch('/attack/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({x: x, y: y, target: targetPlayer})
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.result);
+
+                // Підсвічування клітинки
+                const grid = document.getElementById('grid' + targetPlayer);
+                const index = (parseInt(y) + 1) * 11 + parseInt(x) + 1; // +1 для пропуску заголовків
+                const cell = grid.children[index];
+                cell.classList.add(data.status); // "hit" або "miss"
+
+                // Оновлюємо атакуючого та ціль
+                currentAttacker = data.next_attacker;
+                currentTarget = data.next_target;
+                updateHighlights();
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateHighlights();
+    </script>
+</body>
+</html>
