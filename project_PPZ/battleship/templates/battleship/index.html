@@ -139,7 +139,7 @@
                         cell.dataset.x = col - 1;
                         cell.dataset.y = row - 1;
                         cell.addEventListener('click', function() {
-                            attackCell(player, cell.dataset.x, cell.dataset.y);
+                            attackCell(currentTarget, cell.dataset.x, cell.dataset.y, cell);
                         });
                     }
                     grid.appendChild(cell);
@@ -153,32 +153,6 @@
             });
             document.getElementById('player' + currentAttacker).classList.add('attacker');
             document.getElementById('player' + currentTarget).classList.add('target');
-        }
-
-        function attackCell(targetPlayer, x, y) {
-            fetch('/attack/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({x: x, y: y, target: targetPlayer})
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.result);
-
-                // Підсвічування клітинки
-                const grid = document.getElementById('grid' + targetPlayer);
-                const index = (parseInt(y) + 1) * 11 + parseInt(x) + 1; // +1 для пропуску заголовків
-                const cell = grid.children[index];
-                cell.classList.add(data.status); // "hit" або "miss"
-
-                // Оновлюємо атакуючого та ціль
-                currentAttacker = data.next_attacker;
-                currentTarget = data.next_target;
-                updateHighlights();
-            });
         }
 
         function getCookie(name) {
@@ -197,6 +171,90 @@
         }
 
         updateHighlights();
+
+        document.getElementById('start-game').addEventListener('click', function () {
+            fetch('/reset/', { // Викликає reset на бекенді
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    resetFrontend(); // Очищаємо поле
+                    alert('Нова гра почалася!');
+                }
+            });
+        });
+
+        // Скинути гру
+        document.getElementById('reset-game').addEventListener('click', function () {
+            fetch('/reset/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    resetFrontend();
+                    alert('Гру скинуто.');
+                }
+            });
+        });
+
+
+        function attackCell(targetPlayer, x, y, cellElement) {
+            fetch('/attack/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ x: x, y: y, target: targetPlayer })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // 🛡️ Якщо бекенд повернув помилку (400/500)
+                    return response.json().then(data => {
+                        alert(data.error || "Сталася помилка на сервері");
+                        throw new Error(data.error);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // ✅ Тільки якщо немає помилок, оновлюємо гру
+                if (data.status === "hit") {
+                    cellElement.classList.add('hit');
+                } else {
+                    cellElement.classList.add('miss');
+                }
+                currentAttacker = data.next_attacker;
+                currentTarget = data.next_target;
+                updateHighlights();
+            })
+            .catch(err => {
+                console.error("Помилка:", err.message);
+                // ❌ Нічого не оновлюємо на фронті
+            });
+        }
+
+        // Очищає клітинки та підсвічування
+        function resetFrontend() {
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('hit', 'miss');
+            });
+            players.forEach(p => {
+                document.getElementById('player' + p).classList.remove('attacker', 'target');
+            });
+            currentAttacker = 'A';
+            currentTarget = 'B';
+            updateHighlights();
+        }
+
     </script>
 </body>
 </html>

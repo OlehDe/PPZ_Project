@@ -69,6 +69,9 @@ def attack(request):
         hit = target["board"][y][x] == 1
         status = "hit" if hit else "miss"
 
+        if target["board"][y][x] in [2, 3]:  # 2 = підбитий, 3 = промах
+            return JsonResponse({"error": "Ця клітинка вже була атакована!"}, status=400)
+
         if hit:
             target["board"][y][x] = 2  # 2 = підбитий корабель
             result = f"{attacker_name} влучив у {target_name}!"
